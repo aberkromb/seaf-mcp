@@ -1,0 +1,109 @@
+[
+  {
+    "id": "meta.list_sections",
+    "question": "Какие разделы есть в модели?",
+    "group": "meta",
+    "sections": [],
+    "expression": "( $keys($) )",
+    "explanation": "Корневой контекст $ — объект {раздел: записи}. $keys возвращает список разделов."
+  },
+  {
+    "id": "systems.count",
+    "question": "Сколько систем в модели?",
+    "group": "systems",
+    "sections": ["seaf.company.systems"],
+    "expression": "( $count($keys($.\"seaf.company.systems\")) )",
+    "explanation": "Раздел — объект {id: запись}, поэтому считаем ключи, а не длину массива."
+  },
+  {
+    "id": "systems.first_ids",
+    "question": "Покажи первые несколько ID систем",
+    "group": "systems",
+    "sections": ["seaf.company.systems"],
+    "expression": "( $keys($.\"seaf.company.systems\")[[0..4]] )",
+    "explanation": "Часть массива — индексный фильтр [[a..b]]; позиционный $x[a..b] и slice не поддерживаются (S0202)."
+  },
+  {
+    "id": "systems.find_by_title",
+    "question": "Найди систему по части названия (например, «фискал»)",
+    "group": "systems",
+    "sections": ["seaf.company.systems"],
+    "expression": "( $sift($.\"seaf.company.systems\", function($v){$contains($lowercase($string($v.title)), \"фискал\")}) ~> $keys() )",
+    "explanation": "$sift фильтрует объект и возвращает ОБЪЕКТ; ~> $keys() превращает его в массив ID. $lowercase + $string делают поиск регистронезависимым и безопасным к null."
+  },
+  {
+    "id": "systems.by_id_prefix",
+    "question": "Найди все подсистемы системы «Бронирование» (ID по префиксу)",
+    "group": "systems",
+    "sections": ["seaf.company.systems"],
+    "expression": "( $prefix := \"example.app_system.hotel_booking\"; $keys($.\"seaf.company.systems\")[$substring($, 0, $length($prefix)) = $prefix][[0..4]] )",
+    "explanation": "Полифилл $startswith: сравнение подстроки с префиксом. Несколько операторов — только внутри блока ( ...; )."
+  },
+  {
+    "id": "systems.get_by_id",
+    "question": "Получи название системы по её ID",
+    "group": "systems",
+    "sections": ["seaf.company.systems"],
+    "expression": "( $lookup($.\"seaf.company.systems\", \"<ID системы>\").title )",
+    "explanation": "Доступ по имени из переменной/строки — только $lookup(раздел, id). Шаблон: подставьте реальный ID из systems.by_id_prefix.",
+    "template": true
+  },
+  {
+    "id": "people.count_by_department",
+    "question": "Сколько людей в подразделении со словом «разработ»?",
+    "group": "people",
+    "sections": ["seaf.company.people"],
+    "expression": "( $sift($.\"seaf.company.people\", function($v){$contains($string($v.department), \"разработ\")}) ~> $keys() ~> $count() )",
+    "explanation": "Цепочка ~> $keys() ~> $count(): $sift возвращает объект, поэтому сначала ключи, потом счёт."
+  },
+  {
+    "id": "people.first_n",
+    "question": "Покажи первых N людей (функции $take нет)",
+    "group": "people",
+    "sections": ["seaf.company.people"],
+    "expression": "( $take := function($a, $n){$a[[0..$n-1]]}; $take($keys($.\"seaf.company.people\"), 3) )",
+    "explanation": "Полифилл $take через [[0..n-1]]; $take/$slice/$group/$values на портале не существуют (T1006)."
+  },
+  {
+    "id": "people.group_by_department",
+    "question": "Сгруппируй людей по подразделениям и посчитай",
+    "group": "people",
+    "sections": ["seaf.company.people"],
+    "expression": "( $arr := $map($keys($.\"seaf.company.people\"), function($k){$lookup($.\"seaf.company.people\", $k)}); $g := $arr{ department : 1 }; $map($keys($g), function($d){{\"dept\": $d, \"n\": $count($lookup($g, $d))}})[[0..4]] )",
+    "explanation": "Группировка работает только по массиву: объект раздела сначала превращаем в массив через $map+$lookup. Ключи объекта — строковые литералы. Двойной брейс {{ обязателен: первый { — тело function, второй — объект; function($d){\"dept\": ...} упадёт с S0202."
+  },
+  {
+    "id": "people.record_fields",
+    "question": "Какие поля есть у записи человека?",
+    "group": "people",
+    "sections": ["seaf.company.people"],
+    "expression": "( $each($lookup($.\"seaf.company.people\", \"<ID человека>\"), function($v, $k){$k}) )",
+    "explanation": "$each итерирует объект запись → массив имён полей. Шаблон: подставьте реальный ID.",
+    "template": true
+  },
+  {
+    "id": "relations.system_stakeholders",
+    "question": "Кто стейкхолдеры системы (с ФИО вместо ID)?",
+    "group": "relations",
+    "sections": ["seaf.company.systems", "seaf.company.people"],
+    "expression": "( $s := $lookup($.\"seaf.company.systems\", \"<ID системы>\"); $map($s.stakeholders.name, function($id){$lookup($.\"seaf.company.people\", $id).title}) )",
+    "explanation": "Связь — ID в поле; запись подтягивается $lookup'ом (JOIN). Шаблон: подставьте ID системы.",
+    "template": true
+  },
+  {
+    "id": "relations.system_components",
+    "question": "Какие компоненты реализуют систему «example.app_system.hotel_booking.finance»?",
+    "group": "relations",
+    "sections": ["seaf.company.sys_components", "seaf.company.systems"],
+    "expression": "( $sift($.\"seaf.company.sys_components\", function($c){ \"example.app_system.hotel_booking.finance\" in $c.realizes_system }) ~> $keys() )",
+    "explanation": "Обратный поиск связи: компонент хранит ID системы в поле realizes_system; оператор in проверяет вхождение в массив."
+  },
+  {
+    "id": "products.find_by_title",
+    "question": "Найди продукт по части названия (например, «отель»)",
+    "group": "products",
+    "sections": ["seaf.company.ba.products"],
+    "expression": "( $sift($.\"seaf.company.ba.products\", function($v){$contains($lowercase($string($v.title)), \"отель\")}) ~> $keys() )",
+    "explanation": "Тот же паттерн $sift + $keys, что и для систем; раздел продуктов — seaf.company.ba.products."
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "request": {"query": {"origin": {"people": "seaf.company.ds.people"}, "source": "($count($keys($.\"people\")))"}},
+    "http_status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "note": "Составной origin: корень $ — мапа именованных источников, доступ через $.\"<имя>\". Строковый origin: корень $ — сам датасет."
+  },
+  "response": 123
+}

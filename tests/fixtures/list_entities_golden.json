@@ -1,0 +1,285 @@
+{
+ "entities": {
+  "a": {
+   "title": "Alpha",
+   "num": 5,
+   "active": true,
+   "system": "s1",
+   "stakeholders": [
+    {
+     "name": "p1"
+    },
+    {
+     "name": "p2"
+    }
+   ]
+  },
+  "b": {
+   "title": "Beta",
+   "num": 5.0,
+   "active": false,
+   "system": [
+    "s1",
+    "s2"
+   ],
+   "integrations": {
+    "i001": {
+     "service": "srv1"
+    },
+    "i002": {
+     "service": "srv2"
+    }
+   }
+  },
+  "c": {
+   "title": "Gamma ray",
+   "stakeholders": [],
+   "note": ""
+  },
+  "d": {
+   "title": "Quotes \"and\" \\ slash",
+   "nested": {
+    "deep": {
+     "x": [
+      1,
+      2
+     ]
+    }
+   }
+  }
+ },
+ "cases": [
+  {
+   "name": "eq_string",
+   "where": [
+    {
+     "field": "system",
+     "value": "s1"
+    }
+   ],
+   "expected_ids": [
+    "a",
+    "b"
+   ]
+  },
+  {
+   "name": "eq_in_array",
+   "where": [
+    {
+     "field": "system",
+     "value": "s2"
+    }
+   ],
+   "expected_ids": [
+    "b"
+   ]
+  },
+  {
+   "name": "eq_number",
+   "where": [
+    {
+     "field": "num",
+     "value": "5"
+    }
+   ],
+   "expected_ids": [
+    "a"
+   ]
+  },
+  {
+   "name": "eq_bool_python_style",
+   "where": [
+    {
+     "field": "active",
+     "value": "True"
+    }
+   ],
+   "expected_ids": [
+    "a"
+   ]
+  },
+  {
+   "name": "eq_bool_json_style",
+   "where": [
+    {
+     "field": "active",
+     "value": "true"
+    }
+   ],
+   "expected_ids": []
+  },
+  {
+   "name": "ne_string",
+   "where": [
+    {
+     "field": "system",
+     "value": "s1"
+    }
+   ],
+   "expected_ids": [
+    "a",
+    "b"
+   ]
+  },
+  {
+   "name": "ne_missing_field",
+   "where": [
+    {
+     "field": "nosuch",
+     "op": "ne",
+     "value": "x"
+    }
+   ],
+   "expected_ids": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ]
+  },
+  {
+   "name": "contains_string",
+   "where": [
+    {
+     "field": "title",
+     "op": "contains",
+     "value": "alpha"
+    }
+   ],
+   "expected_ids": [
+    "a"
+   ]
+  },
+  {
+   "name": "contains_substring_ray",
+   "where": [
+    {
+     "field": "title",
+     "op": "contains",
+     "value": "RAY"
+    }
+   ],
+   "expected_ids": [
+    "c"
+   ]
+  },
+  {
+   "name": "contains_number",
+   "where": [
+    {
+     "field": "num",
+     "op": "contains",
+     "value": "5"
+    }
+   ],
+   "expected_ids": [
+    "a",
+    "b"
+   ]
+  },
+  {
+   "name": "missing_stakeholders",
+   "where": [
+    {
+     "field": "stakeholders",
+     "op": "missing"
+    }
+   ],
+   "expected_ids": [
+    "b",
+    "c",
+    "d"
+   ]
+  },
+  {
+   "name": "missing_empty_note",
+   "where": [
+    {
+     "field": "note",
+     "op": "missing"
+    }
+   ],
+   "expected_ids": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ]
+  },
+  {
+   "name": "exists_system",
+   "where": [
+    {
+     "field": "system",
+     "op": "exists"
+    }
+   ],
+   "expected_ids": [
+    "a",
+    "b"
+   ]
+  },
+  {
+   "name": "exists_empty_stakeholders",
+   "where": [
+    {
+     "field": "stakeholders",
+     "op": "exists"
+    }
+   ],
+   "expected_ids": [
+    "a"
+   ]
+  },
+  {
+   "name": "nested_path",
+   "where": [
+    {
+     "field": "nested.deep.x",
+     "op": "exists"
+    }
+   ],
+   "expected_ids": [
+    "d"
+   ]
+  },
+  {
+   "name": "maplike_service",
+   "where": [
+    {
+     "field": "integrations.service",
+     "value": "srv1"
+    }
+   ],
+   "expected_ids": [
+    "b"
+   ]
+  },
+  {
+   "name": "maplike_service_array",
+   "where": [
+    {
+     "field": "integrations.service",
+     "value": "srv2"
+    }
+   ],
+   "expected_ids": [
+    "b"
+   ]
+  },
+  {
+   "name": "multi_and",
+   "where": [
+    {
+     "field": "system",
+     "op": "exists"
+    },
+    {
+     "field": "active",
+     "value": "false"
+    }
+   ],
+   "expected_ids": []
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "request": {"query": "({\"a\": 1}); ({\"b\": 2})"},
+    "http_status": 500,
+    "note": "Точка с запятой вне блока (...). Код S0201, token \";\". error.stack на портале есть, здесь удалён."
+  },
+  "response": {
+    "message": "Syntax error: \";\"",
+    "error": {
+      "code": "S0201",
+      "position": 11,
+      "token": ";",
+      "message": "Syntax error: \";\""
+    }
+  }
+}

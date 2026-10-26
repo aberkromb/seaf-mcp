@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "http_status": 500,
+    "note": "Два независимых случая S0202. 1) Позиционный диапазон $x[0..4] НЕ поддерживается (в отличие от конструктора [0..5] и индексного фильтра [[0..4]]). 2) Тело function из нескольких выражений без обёртки (...) — баг work_log 053, подтверждён. error.stack на портале есть, здесь удалён."
+  },
+  "cases": [
+    {
+      "request": {"query": "($k := $keys($.\"seaf.company.people\"); $k[0..4])"},
+      "response": {
+        "message": "Expected \"]\", got \"..\"",
+        "error": {"code": "S0202", "position": 45, "token": "..", "value": "]", "message": "Expected \"]\", got \"..\""}
+      }
+    },
+    {
+      "request": {"query": "($f := function($x){ $y := $x * 2; $y + 1 }; $f(3))"},
+      "response": {
+        "message": "Expected \"}\", got \";\"",
+        "error": {"code": "S0202", "position": 34, "token": ";", "value": "}", "message": "Expected \"}\", got \";\""}
+      }
+    }
+  ]
+}

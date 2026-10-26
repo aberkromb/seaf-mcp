@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "request": {"query": "($take([1, 2, 3], 2))"},
+    "http_status": 500,
+    "note": "Вызов несуществующей функции. $take, $slice, $group, $values, $nosuchfn — все T1006, token = имя функции. error.stack на портале есть, здесь удалён."
+  },
+  "response": {
+    "message": "Attempted to invoke a non-function",
+    "error": {
+      "code": "T1006",
+      "position": 7,
+      "token": "take",
+      "message": "Attempted to invoke a non-function"
+    }
+  }
+}

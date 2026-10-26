@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "request": {"query": "($lookup($, \"seaf.company.no_such_section\"))"},
+    "http_status": 200,
+    "body_note": "Тело пустое, 0 байт, не JSON. Так выглядит JSONata-undefined. То же для $keys() от undefined и фильтра без совпадений.",
+    "body_bytes": 0
+  },
+  "response": null
+}

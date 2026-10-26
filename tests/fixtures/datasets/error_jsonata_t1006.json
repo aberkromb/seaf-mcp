@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "request": {"query": {"origin": "seaf.company.ds.people", "source": "($foo(1))"}},
+    "http_status": 500,
+    "content_type": "application/json; charset=utf-8",
+    "note": "Вызов несуществующей функции JSONata. error.code присутствует; error.stack на портале есть, здесь удалён."
+  },
+  "response": {
+    "message": "Attempted to invoke a non-function",
+    "error": {
+      "code": "T1006",
+      "position": 6,
+      "token": "foo",
+      "message": "Attempted to invoke a non-function"
+    }
+  }
+}

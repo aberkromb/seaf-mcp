@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "request": {"query": "/datasets/seaf.company.ds.nonexistent"},
+    "http_status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "note": "Несуществующий ID датасета НЕ ошибка: HTTP 200 с телом null."
+  },
+  "response": null
+}

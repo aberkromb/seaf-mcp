@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "request": {"query": {"origin": "seaf.company.ds.people", "source": "$count($keys($))"}},
+    "http_status": 500,
+    "content_type": "application/json; charset=utf-8",
+    "note": "source без оборачивающих скобок (...) — HTTP 500. Стек-трейс в error.stack на портале присутствует, здесь удалён."
+  },
+  "response": {
+    "message": "Не найден источник данных [$count($keys($))] для расчета [seaf.company.ds.people]",
+    "error": {
+      "objectId": "seaf.company.ds.people",
+      "objectDepth": 0
+    }
+  }
+}

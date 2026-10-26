@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "http_status": 500,
+    "note": "Неподдерживаемые операторы. ~ — S0204; ?. — S0211. error.stack на портале есть, здесь удалён."
+  },
+  "cases": [
+    {
+      "request": {"query": "(\"a\" ~ \"b\")"},
+      "response": {
+        "message": "Unknown operator: \"~\"",
+        "error": {"code": "S0204", "position": 6, "token": "~", "message": "Unknown operator: \"~\""}
+      }
+    },
+    {
+      "request": {"query": "($x := {\"a\": 1}; $x?.a)"},
+      "response": {
+        "message": "The symbol \".\" cannot be used as a unary operator",
+        "error": {"code": "S0211", "token": ".", "position": 21, "message": "The symbol \".\" cannot be used as a unary operator"}
+      }
+    }
+  ]
+}

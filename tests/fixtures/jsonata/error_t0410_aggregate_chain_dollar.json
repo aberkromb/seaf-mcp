@@ -1,0 +1,14 @@
+{
+  "_meta": {
+    "request": {"query": "([1, 2, 3] ~> $count($))"},
+    "http_status": 500,
+    "note": "Подтверждённый баг: $ в цепочке ~> — корневой контекст, а не значение цепочки. ВАЖНО: на портале error.value содержит ДАМП КОНТЕКСТА (кусок манифеста, десятки КБ) — обязательно срезать вместе со stack. Здесь value удалён. То же для $sum($), $avg($) и т.п. Рабочая форма: $count($x) или $x ~> $count()."
+  },
+  "response": {
+    "message": "Argument 2 of function \"count\" does not match function signature",
+    "error": {
+      "code": "T0410",
+      "message": "Argument 2 of function \"count\" does not match function signature"
+    }
+  }
+}

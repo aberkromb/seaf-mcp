@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "http_status": 200,
+    "note": "Случаи, где портал НЕ ругается, а молча возвращает пустое/мусорное — вход для preflight-подсказок (задача 011). Расхождения с helper: bare key не даёт T1003, $lookup со строкой первым аргументом не даёт ошибки."
+  },
+  "cases": [
+    {
+      "name": "bare_key_object",
+      "request": {"query": "({field: \"value\"})"},
+      "body": {},
+      "body_note": "Ключ-идентификатор без кавычек вычисляется как выражение -> undefined -> ключ молча пропадает. Правильно: {\"field\": \"value\"}."
+    },
+    {
+      "name": "lookup_string_first_arg",
+      "request": {"query": "($lookup(\"seaf.company.systems\", \"x\"))"},
+      "body_note": "Пустое тело (undefined), HTTP 200. Правильно: $lookup($, \"seaf.company.systems\"). Исключение — цепочка ~> $lookup(...)."
+    },
+    {
+      "name": "backtick_name",
+      "request": {"query": "($x := {\"`weird name`\": 5}; $x.`weird name`)"},
+      "body_note": "Пустое тело (undefined), HTTP 200 — НЕ потому что backtick сломан: в конструкторе объекта backtick берётся ЛИТЕРАЛЬНО (ключ = \"`weird name`\" с кавычками). В путях backtick-имена работают ($.`seaf.company.systems`, $x.`weird name` — проверено 2026-10-23, см. карточку 002)."
+    },
+    {
+      "name": "grouping_over_object_noop",
+      "request": {"query": "($g := $.\"seaf.company.people\"{ department : 1 }; $keys($g)[[0..2]])"},
+      "body_note": "Пустое тело. Конструктор объекта НЕ итерирует объект объектов (по массиву — работает). Сначала $map($keys(...)) или $each/$sift."
+    }
+  ]
+}

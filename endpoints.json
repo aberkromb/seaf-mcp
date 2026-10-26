@@ -1,0 +1,566 @@
+{
+  "version": "1.0.0",
+  "baseUrl": "http://localhost:8080",
+  "endpoints": [
+    {
+      "id": "get_health",
+      "description": "Когда вызывать: проверить доступность портала (health-check). Возвращает {\"message\": \"app is alive\"}. Дальше: list_sections.",
+      "method": "GET",
+      "path": "/health",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/health",
+      "responseDescription": "Returns 200 with {\"message\": \"app is alive\"} if ready, or 500 with error message if not ready"
+    },
+    {
+      "id": "get_seaf_core_api_title",
+      "description": "Portal title from the VUE_APP_DOCHUB_TITLE environment variable",
+      "method": "GET",
+      "path": "/seaf-core/api/title",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/title",
+      "responseDescription": "Returns {\"title\": \"SEAF\"}",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_env_config",
+      "description": "Frontend configuration: authorization settings, PlantUML, Clickstream",
+      "method": "GET",
+      "path": "/seaf-core/api/env-config",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/env-config",
+      "responseDescription": "Returns configuration object with clickstreamReportUrl, authorityServer, plantUmlServer, etc.",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_jsonata",
+      "description": "Run a BUILT-IN (predefined) JSONata query by its 36-character UUID. Free-form JSONata via this GET endpoint is rejected with 403 'Access denied' - use seaf_jsonata_query instead.",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/jsonata/:query",
+      "pathParams": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "36-character UUID of a built-in query"
+        }
+      ],
+      "queryParams": [
+        {
+          "name": "params",
+          "type": "string",
+          "required": false,
+          "description": "JSON string with variables to substitute into the query"
+        },
+        {
+          "name": "subject",
+          "type": "string",
+          "required": false,
+          "description": "JSON string with request subject context"
+        },
+        {
+          "name": "baseuri",
+          "type": "string",
+          "required": false,
+          "description": "Base URI for resolving relative paths"
+        },
+        {
+          "name": "envelope",
+          "type": "string",
+          "required": false,
+          "description": "Wrap the response in envelope format (\"true\" or \"false\")"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/core/storage/jsonata/(components)\"",
+      "responseDescription": "JSONata query result (any JSON structure)",
+      "hidden": true
+    },
+    {
+      "id": "seaf_jsonata_query",
+      "description": "Когда вызывать: нужен произвольный JSONata по манифесту модели (корневой $ — манифест); для датасетов — query_dataset, для разведки формы результата — describe_query_result. Возвращает результат выражения; ошибки JSONata (S0xxx/T0xxx) приходят с подсказкой по исправлению. Дальше: get_entity/list_entities для типовых выборок без JSONata.",
+      "method": "POST",
+      "path": "/seaf-core/api/core/storage/jsonata",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "JSONata expression. It is automatically wrapped in parentheses before sending."
+        }
+      ],
+      "jsonataParams": [
+        "query"
+      ],
+      "readOnly": true,
+      "requestExample": "curl -X POST -H 'content-type: application/json' -d '{\"query\":\"($count($keys(`seaf.company.systems`)))\"}' http://localhost:8080/seaf-core/api/core/storage/jsonata",
+      "responseDescription": "JSONata result (any JSON). On JSONata syntax error returns 500 with {message, error.code, error.position}."
+    },
+    {
+      "id": "put_seaf_core_api_core_storage_reload",
+      "description": "Reload the architecture manifest from disk. Synchronous operation (~7 min on Rosetta)",
+      "method": "PUT",
+      "path": "/seaf-core/api/core/storage/reload",
+      "pathParams": [],
+      "queryParams": [
+        {
+          "name": "secret",
+          "type": "string",
+          "required": false,
+          "description": "Must match VUE_APP_DOCHUB_RELOAD_SECRET. If the variable is not set — secret is not required"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": false,
+      "requestExample": "curl -X PUT \"http://localhost:8080/seaf-core/api/core/storage/reload?secret=mysecret\"",
+      "responseDescription": "Returns 200 with {\"message\": \"success\"} or 403 with error if secret is invalid",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_release_data_profile",
+      "description": "Retrieve data by dataset path or inline profile",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/release-data-profile/:query",
+      "pathParams": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Dataset path starting with /, inline JSON profile starting with {, or base64-encoded compressed profile"
+        }
+      ],
+      "queryParams": [
+        {
+          "name": "params",
+          "type": "string",
+          "required": false,
+          "description": "JSON string with parameters for the dataset"
+        },
+        {
+          "name": "envelope",
+          "type": "string",
+          "required": false,
+          "description": "Wrap in envelope format (\"true\")"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/core/storage/release-data-profile/%2Fdatasets%2FmyDataset\"",
+      "responseDescription": "Returns dataset data as JSON",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_user_menu",
+      "description": "Navigation menu tree for the portal",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/user-menu",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/core/storage/user-menu",
+      "responseDescription": "JSON array of menu items (sections, subsections, links)",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_versions",
+      "description": "Когда вызывать: узнать версию ядра портала и хэш манифеста. Дальше: list_sections.",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/versions",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/core/storage/versions",
+      "responseDescription": "Returns {\"archHash\": \"...\", \"coreVersion\": \"3.28.0\", \"enableChecker\": true}"
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_problems",
+      "description": "Когда вызывать: увидеть ошибки валидации, найденные при загрузке манифеста. Дальше: зависит от найденных проблем.",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/problems/",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/core/storage/problems/",
+      "responseDescription": "Array of problem objects (empty array if no issues)"
+    },
+    {
+      "id": "post_seaf_core_api_core_storage_put_content",
+      "description": "Save changes to a Bitbucket repository. Used for editing architecture via the UI",
+      "method": "POST",
+      "path": "/seaf-core/api/core/storage/put-content/:hash",
+      "pathParams": [
+        {
+          "name": "hash",
+          "type": "string",
+          "required": true,
+          "description": "md5 hash of the root manifest file path"
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [
+        {
+          "name": "content",
+          "type": "object",
+          "required": true,
+          "description": "Object where keys are file paths and values are file contents (YAML or JSON strings)"
+        }
+      ],
+      "readOnly": false,
+      "requestExample": "curl -X POST http://localhost:8080/seaf-core/api/core/storage/put-content/:hash -d '{\"content\": {\"path/to/file.yaml\": \"yaml content\"}}'",
+      "responseDescription": "Returns success/error response from Bitbucket API",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_user_info",
+      "description": "Current user information (when role model is enabled)",
+      "method": "GET",
+      "path": "/seaf-core/api/core/user-info",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/core/user-info",
+      "responseDescription": "Returns {\"user\": {...}} or empty response if roles are not configured",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_user_rights",
+      "description": "User permissions. Always returns an empty array in backend mode",
+      "method": "GET",
+      "path": "/seaf-core/api/core/user/rights",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/core/user/rights",
+      "responseDescription": "Returns empty array []",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_search_searchable_entities",
+      "description": "List of entity types available for search",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/search/searchable-entities",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/core/storage/search/searchable-entities",
+      "responseDescription": "Array of objects [{id, title, ...}]",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_search_entity_filters",
+      "description": "List of available filters for a given entity type",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/search/entity-filters",
+      "pathParams": [],
+      "queryParams": [
+        {
+          "name": "choice",
+          "type": "string",
+          "required": true,
+          "description": "Entity type ID from /searchable-entities"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/core/storage/search/entity-filters?choice=components\"",
+      "responseDescription": "Array of filters [{field, type, ...}]. Returns 400 if choice is not provided",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_search_rel_suggestions",
+      "description": "Value suggestions for a relation type filter",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/search/rel-suggestions",
+      "pathParams": [],
+      "queryParams": [
+        {
+          "name": "relTarget",
+          "type": "string",
+          "required": true,
+          "description": "Target relation entity"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search text (minimum 1 character)"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/core/storage/search/rel-suggestions?relTarget=components&query=seaf\"",
+      "responseDescription": "Array of suggestions",
+      "hidden": true
+    },
+    {
+      "id": "post_seaf_core_api_core_storage_search_search_run",
+      "description": "Execute a search across manifest entities",
+      "method": "POST",
+      "path": "/seaf-core/api/core/storage/search/search-run",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [
+        {
+          "name": "choice",
+          "type": "string",
+          "required": true,
+          "description": "Entity type ID or \"$all\" to search across all types"
+        },
+        {
+          "name": "filters",
+          "type": "array",
+          "required": true,
+          "description": "List of active filters (may be empty)"
+        },
+        {
+          "name": "searchQuery",
+          "type": "string",
+          "required": false,
+          "description": "Full-text search query"
+        }
+      ],
+      "readOnly": true,
+      "requestExample": "curl -X POST http://localhost:8080/seaf-core/api/core/storage/search/search-run -H \"Content-Type: application/json\" -d '{\"choice\": \"components\", \"filters\": [], \"searchQuery\": \"gateway\"}'",
+      "responseDescription": "Array of matched entities",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_core_storage_proxy",
+      "description": "Proxy request to a file in the storage backend (GitLab, Bitbucket, filesystem)",
+      "method": "GET",
+      "path": "/seaf-core/api/core/storage/:hash/*",
+      "pathParams": [
+        {
+          "name": "hash",
+          "type": "string",
+          "required": true,
+          "description": "md5 hash of the file URI in the manifest (from storage.md5Map)"
+        },
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Relative path to the file (wildcard path parameter)"
+        }
+      ],
+      "queryParams": [
+        {
+          "name": "envelope",
+          "type": "string",
+          "required": false,
+          "description": "Wrap file contents in envelope format (\"true\")"
+        },
+        {
+          "name": "inlineContent",
+          "type": "string",
+          "required": false,
+          "description": "Use only baseURL without uri"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/core/storage/:hash/path/to/file.yaml\"",
+      "responseDescription": "File contents from storage backend",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_entities_presentations",
+      "description": "Render an entity presentation. Only upload type is supported in backend mode",
+      "method": "GET",
+      "path": "/seaf-core/api/entities/:entity/presentations/:presentation",
+      "pathParams": [
+        {
+          "name": "entity",
+          "type": "string",
+          "required": true,
+          "description": "Entity type ID from the manifest (e.g. seaf.ta.services)"
+        },
+        {
+          "name": "presentation",
+          "type": "string",
+          "required": true,
+          "description": "Presentation ID (e.g. default, plantuml)"
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/entities/seaf.ta.services/presentations/default\"",
+      "responseDescription": "JSON data or text according to mimetype. Returns 404 if not found, 405 if presentation type is not upload",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_smartants",
+      "description": "Request to the SmartAnts engine for diagram rendering",
+      "method": "GET",
+      "path": "/seaf-core/api/smartants/:data",
+      "pathParams": [
+        {
+          "name": "data",
+          "type": "string",
+          "required": true,
+          "description": "base64-encoded + compressed JSON request (generated by the frontend)"
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/smartants/:data\"",
+      "responseDescription": "Returns 200 with {\"result\": \"OK\", ...} or 503 with {\"message\": \"Smartants Error\", ...}",
+      "hidden": true
+    },
+    {
+      "id": "put_seaf_core_api_logger_update_level",
+      "description": "Change the logging level without restarting the server",
+      "method": "PUT",
+      "path": "/seaf-core/api/logger/update-level",
+      "pathParams": [],
+      "queryParams": [
+        {
+          "name": "secret",
+          "type": "string",
+          "required": false,
+          "description": "Secret from VUE_APP_DOCHUB_RELOAD_SECRET env variable"
+        },
+        {
+          "name": "level",
+          "type": "string",
+          "required": true,
+          "description": "Log level: trace, debug, info, warn, error"
+        }
+      ],
+      "bodyParams": [],
+      "readOnly": false,
+      "requestExample": "curl -X PUT \"http://localhost:8080/seaf-core/api/logger/update-level?level=debug\"",
+      "responseDescription": "Returns success/error response",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_logger_level",
+      "description": "Get the current logging level",
+      "method": "GET",
+      "path": "/seaf-core/api/logger/level",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl \"http://localhost:8080/seaf-core/api/logger/level\"",
+      "responseDescription": "Returns {\"level\": \"info\"}",
+      "hidden": true
+    },
+    {
+      "id": "get_seaf_core_api_new_chat_agents",
+      "description": "List of available AI agents",
+      "method": "GET",
+      "path": "/seaf-core/api/new/chat/agents",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "readOnly": true,
+      "requestExample": "curl http://localhost:8080/seaf-core/api/new/chat/agents",
+      "responseDescription": "Array of available AI agent configurations",
+      "hidden": true
+    },
+    {
+      "id": "post_seaf_core_api_new_chat_start",
+      "description": "Start a new chat session",
+      "method": "POST",
+      "path": "/seaf-core/api/new/chat/start",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": false,
+          "description": "Optional custom session ID"
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "required": true,
+          "description": "Agent type"
+        },
+        {
+          "name": "systemPrompt",
+          "type": "string",
+          "required": false,
+          "description": "System prompt for the agent"
+        },
+        {
+          "name": "config",
+          "type": "object",
+          "required": false,
+          "description": "Additional configuration object"
+        }
+      ],
+      "readOnly": false,
+      "requestExample": "curl -X POST http://localhost:8080/seaf-core/api/new/chat/start -H \"Content-Type: application/json\" -d '{\"type\": \"AgentType\", \"systemPrompt\": \"You are an architecture assistant...\"}'",
+      "responseDescription": "Returns {\"sessionId\": \"uuid\"}",
+      "hidden": true
+    },
+    {
+      "id": "post_seaf_core_api_new_chat_message",
+      "description": "Send a message to a session. Response is a Server-Sent Events stream",
+      "method": "POST",
+      "path": "/seaf-core/api/new/chat/message",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true,
+          "description": "Session UUID from /chat/start"
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "required": true,
+          "description": "User message text"
+        }
+      ],
+      "readOnly": true,
+      "requestExample": "curl -X POST http://localhost:8080/seaf-core/api/new/chat/message -H \"Content-Type: application/json\" -d '{\"sessionId\": \"uuid\", \"message\": \"Which components use Kafka?\"}'",
+      "responseDescription": "Server-Sent Events stream (Content-Type: text/event-stream). Chunks: data: {...}. End: data: [DONE]",
+      "hidden": true
+    },
+    {
+      "id": "post_seaf_core_api_new_chat_end",
+      "description": "End a chat session and release resources",
+      "method": "POST",
+      "path": "/seaf-core/api/new/chat/end",
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true,
+          "description": "Session UUID to terminate"
+        }
+      ],
+      "readOnly": false,
+      "requestExample": "curl -X POST http://localhost:8080/seaf-core/api/new/chat/end -H \"Content-Type: application/json\" -d '{\"sessionId\": \"uuid\"}'",
+      "responseDescription": "Returns success response",
+      "hidden": true
+    }
+  ]
+}

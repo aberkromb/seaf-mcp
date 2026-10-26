@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "request": {"query": "/datasets/seaf.company.ds.people"},
+    "http_status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "response_size_bytes_full": 68594,
+    "records_full": 123,
+    "note": "Ответ усечён до 2 записей; значения полей вымышленные. Полная форма: объект объектов, ключ — __id__ записи."
+  },
+  "response": {
+    "example.person.example_one": {
+      "__id__": "example.person.example_one",
+      "__entity_id__": "seaf.company.people",
+      "__entity_title__": "Люди",
+      "__company_id__": "example",
+      "__company_title__": "example",
+      "__domain__": "example",
+      "__object_type__": "person",
+      "__object_id__": "example_one",
+      "__link_to_card__": "/entities/seaf.company.people/card?id=example.person.example_one",
+      "title": "Иванов Иван",
+      "role": "Архитектор",
+      "department": "Департамент примеров"
+    },
+    "example.person.example_two": {
+      "__id__": "example.person.example_two",
+      "__entity_id__": "seaf.company.people",
+      "__entity_title__": "Люди",
+      "__company_id__": "example",
+      "__company_title__": "example",
+      "__domain__": "example",
+      "__object_type__": "person",
+      "__object_id__": "example_two",
+      "__link_to_card__": "/entities/seaf.company.people/card?id=example.person.example_two",
+      "title": "Петров Пётр",
+      "role": "Разработчик",
+      "department": "Департамент примеров"
+    }
+  }
+}
